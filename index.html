@@ -642,70 +642,118 @@
     </div>
 
     <script>
-        // ===== ЗАЩИТА ОТ КОПИРОВАНИЯ И ПРОСМОТРА КОДА =====
-        (function antiCopy() {
-            // Блокировка контекстного меню (правая кнопка мыши)
-            document.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-                return false;
-            });
+        // ====================================================
+        //   КЛИЕНТСКИЙ АНТИ-DDOS (защита от флуда и атак)
+        // ====================================================
+        (function antiDDoS() {
+            // === 1. Защита от множественных кликов (rate limiting) ===
+            // Разрешаем не более 5 действий за 10 секунд.
+            // При превышении блокируем на 30 секунд.
+            const LIMIT = 5;              // максимум действий
+            const WINDOW = 10000;         // 10 секунд
+            const BAN_TIME = 30000;       // 30 секунд бана
 
-            // Блокировка клавиш разработчика
-            document.addEventListener('keydown', function(e) {
-                // F12
-                if (e.key === 'F12' || e.keyCode === 123) {
-                    e.preventDefault();
-                    return false;
-                }
-                // Ctrl+Shift+I (инспектор), Ctrl+Shift+J (консоль), Ctrl+Shift+C (выбор элемента)
-                if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) {
-                    e.preventDefault();
-                    return false;
-                }
-                // Ctrl+U (просмотр исходного кода)
-                if (e.ctrlKey && (e.key === 'u' || e.key === 'U')) {
-                    e.preventDefault();
-                    return false;
-                }
-                // Ctrl+S (сохранение страницы)
-                if (e.ctrlKey && (e.key === 's' || e.key === 'S')) {
-                    e.preventDefault();
-                    return false;
-                }
-                // Ctrl+P (печать) — иногда используют для сохранения
-                if (e.ctrlKey && (e.key === 'p' || e.key === 'P')) {
-                    e.preventDefault();
-                    return false;
-                }
-                // Ctrl+Shift+P (командная панель)
-                if (e.ctrlKey && e.shiftKey && e.key === 'P') {
-                    e.preventDefault();
-                    return false;
-                }
-                // Ctrl+Shift+O (просмотр ресурсов)
-                if (e.ctrlKey && e.shiftKey && e.key === 'O') {
-                    e.preventDefault();
-                    return false;
-                }
-            });
+            let actionTimestamps = [];
+            let isBanned = false;
+            let banTimer = null;
 
-            // Дополнительная защита: запрет выделения текста (уже в CSS, но дублируем)
-            document.addEventListener('selectstart', function(e) {
-                e.preventDefault();
-            });
+            // Функция проверки и регистрации действия
+            function checkAndRegisterAction() {
+                const now = Date.now();
 
-            // Блокировка перетаскивания изображений (сохранение через drag)
-            document.addEventListener('dragstart', function(e) {
-                if (e.target.tagName === 'IMG') {
-                    e.preventDefault();
+                // Если в бане — отклоняем
+                if (isBanned) {
+                    // Можно показать предупреждение, но чтобы не раздражать, просто игнорируем
+                    // Возвращаем false, чтобы заблокировать действие
                     return false;
                 }
-            });
 
-            // Отключаем возможность открыть инструменты разработчика через долгое нажатие на мобильных (не везде)
-            // и другие возможные комбинации
-            console.log('Защита включена. Копирование и просмотр кода ограничены.');
+                // Очищаем старые записи
+                actionTimestamps = actionTimestamps.filter(ts => now - ts < WINDOW);
+
+                // Проверяем, не превышен ли лимит
+                if (actionTimestamps.length >= LIMIT) {
+                    // Превышение -> бан
+                    isBanned = true;
+                    if (banTimer) clearTimeout(banTimer);
+                    banTimer = setTimeout(() => {
+                        isBanned = false;
+                        actionTimestamps = [];
+                        banTimer = null;
+                        console.log('Анти-DDoS: бан снят, можно снова кликать.');
+                    }, BAN_TIME);
+
+                    // Показываем предупреждение (только один раз, чтобы не заспамить)
+                    if (!window._ddosWarningShown) {
+                        window._ddosWarningShown = true;
+                        alert('⚠️ Превышена частота запросов. Доступ заблокирован на 30 секунд для защиты от DDoS.');
+                        setTimeout(() => { window._ddosWarningShown = false; }, 5000);
+                    }
+                    return false;
+                }
+
+                // Регистрируем действие
+                actionTimestamps.push(now);
+                return true;
+            }
+
+            // === 2. Защита от быстрых повторных кликов по одной кнопке (debounce) ===
+            // Ограничиваем частоту открытия модальных окон (не чаще 1 раза в 500 мс)
+            let lastModalOpen = 0;
+            const MODAL_COOLDOWN = 500; // 0.5 секунды
+
+            function canOpenModal() {
+                const now = Date.now();
+                if (now - lastModalOpen < MODAL_COOLDOWN) {
+                    return false;
+                }
+                lastModalOpen = now;
+                return true;
+            }
+
+            // === 3. Защита от перезагрузки страницы (F5) через localStorage ===
+            // Если страница обновляется чаще 1 раза в 5 секунд — блокируем
+            const RELOAD_LIMIT = 5000; // 5 секунд
+            const lastReloadKey = 'lastReloadTime';
+            const lastReload = localStorage.getItem(lastReloadKey);
+            const now = Date.now();
+            if (lastReload && (now - parseInt(lastReload, 10)) < RELOAD_LIMIT) {
+                // Слишком частая перезагрузка — блокируем страницу
+                document.body.innerHTML = `
+                    <div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#25293c;color:#fff;font-size:2rem;text-align:center;padding:20px;">
+                        <div>
+                            <h1 style="color:#f5b042;">⚠️ Защита от DDoS</h1>
+                            <p style="font-size:1.2rem;margin-top:20px;">Слишком частые обновления страницы. Подождите немного.</p>
+                            <p style="font-size:1rem;color:#8892b0;margin-top:10px;">Попробуйте через 5 секунд.</p>
+                        </div>
+                    </div>
+                `;
+                // Также блокируем все скрипты, чтобы не было лишних действий
+                throw new Error('Too many reloads');
+            }
+            localStorage.setItem(lastReloadKey, now.toString());
+
+            // === 4. Защита от открытия большого количества вкладок (опционально) ===
+            // Можно ограничить количество окон через localStorage, но это не надёжно.
+            // Пропустим, чтобы не мешать пользователю.
+
+            // === 5. Предотвращение автоматических скриптов через проверку на бота ===
+            // Простая проверка: если событие клика сгенерировано программно (isTrusted === false), блокируем.
+            // Это работает только для кликов, но мы можем добавить проверку в обработчике.
+
+            // Сохраняем функции в глобальный объект для использования в обработчиках
+            window.__ddos = {
+                checkAndRegisterAction: checkAndRegisterAction,
+                canOpenModal: canOpenModal,
+                isBanned: () => isBanned
+            };
+
+            console.log('Анти-DDoS защита активирована.');
         })();
+
+        // ====================================================
+        //   ОСНОВНОЙ СКРИПТ ПАНЕЛИ
+        // ====================================================
 
         // ===== ДАННЫЕ С ССЫЛКАМИ =====
         const items = [{
@@ -750,8 +798,19 @@
         const downloadLink = document.getElementById('downloadLink');
         const placeholderText = document.getElementById('placeholderText');
 
-        // ===== ОТКРЫТЬ МОДАЛКУ =====
+        // ===== ОТКРЫТЬ МОДАЛКУ С ЗАЩИТОЙ =====
         function openModal(index) {
+            // === Анти-DDoS: проверка лимита кликов ===
+            if (!window.__ddos.checkAndRegisterAction()) {
+                // Превышен лимит или бан — игнорируем
+                return;
+            }
+
+            // === Анти-DDoS: защита от быстрых повторных открытий ===
+            if (!window.__ddos.canOpenModal()) {
+                return;
+            }
+
             const item = items[index];
             if (!item) return;
 
@@ -786,9 +845,14 @@
         }
 
         // ===== СОБЫТИЯ =====
+        // Обработчик кликов по карточкам с проверкой на программный клик
         document.querySelectorAll('.card').forEach((card) => {
-            card.addEventListener('click', () => {
-                const idx = parseInt(card.dataset.index, 10);
+            card.addEventListener('click', function(e) {
+                // Защита от программных кликов (скриптов)
+                if (!e.isTrusted) {
+                    return;
+                }
+                const idx = parseInt(this.dataset.index, 10);
                 if (!isNaN(idx)) openModal(idx);
             });
         });
@@ -800,6 +864,12 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeModal();
         });
+
+        // ===== ДОПОЛНИТЕЛЬНАЯ ЗАЩИТА: блокировка автоматических скриптов через MutationObserver =====
+        // Если кто-то пытается вставить скрипт или изменить DOM — можно предупредить,
+        // но для простоты оставим так.
+
+        console.log('Панель загружена. Защита активна.');
     </script>
 
 </body>
