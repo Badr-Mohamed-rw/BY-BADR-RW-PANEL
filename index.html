@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>Arizona RP Panel | By Badr-RW</title>
+    <style>
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #25293c;
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+
+        /* ===== FULLSCREEN PANEL ===== */
+        .panel {
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(145deg, #25293c 0%, #2e3248 100%);
+            padding: 30px 50px 50px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 22px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            flex-shrink: 0;
+        }
+
+        .brand h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .brand .sub {
+            font-size: 1.15rem;
+            color: #a8b2d1;
+            margin-top: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== GRID — КРУПНЫЕ КАРТОЧКИ ===== */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 40px;
+            flex: 1;
+            align-content: start;
+        }
+
+        /* ===== CARD ===== */
+        .card {
+            background: rgba(20, 24, 38, 0.85);
+            border-radius: 28px;
+            padding: 28px 28px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.3s ease, border-color 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, transparent 60%, rgba(0, 0, 0, 0.25));
+            pointer-events: none;
+            border-radius: 28px;
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .card:active {
+            transform: scale(0.97);
+        }
+
+        .card .img-wrap {
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #10131c;
+            margin-bottom: 22px;
+            position: relative;
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .card .img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s ease;
+            pointer-events: none;
+        }
+
+        .card:hover .img-wrap img {
+            transform: scale(1.06);
+        }
+
+        .card .card-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #f0f2f8;
+            letter-spacing: 0.2px;
+            line-height: 1.3;
+            position: relative;
+            z-index: 2;
+        }
+
+        .card .card-title small {
+            display: block;
+            font-weight: 400;
+            font-size: 1rem;
+            color: #8892b0;
+            margin-top: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        .card .click-hint {
+            font-size: 0.9rem;
+            color: #4a536b;
+            margin-top: 18px;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+            position: relative;
+            z-index: 2;
+        }
+
+        .card:hover .click-hint {
+            opacity: 1;
+            color: #f5b042;
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(14px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 30px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal {
+            background: #1e2337;
+            border-radius: 40px;
+            max-width: 820px;
+            width: 100%;
+            padding: 45px 45px 50px;
+            box-shadow: 0 50px 100px rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            position: relative;
+            animation: slideUp 0.35s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-close {
+            position: sticky;
+            top: 0;
+            float: right;
+            background: none;
+            border: none;
+            color: #6a7490;
+            font-size: 2.6rem;
+            cursor: pointer;
+            transition: color 0.2s, transform 0.2s;
+            line-height: 1;
+            padding: 4px 12px;
+            border-radius: 12px;
+            z-index: 10;
+        }
+
+        .modal-close:hover {
+            color: #fff;
+            transform: rotate(90deg);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .modal .modal-img {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border-radius: 24px;
+            overflow: hidden;
+            background: #10131c;
+            margin-bottom: 28px;
+            box-shadow: 0 12px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal .modal-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            pointer-events: none;
+        }
+
+        .modal .modal-title {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: #f0f2f8;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        .modal .modal-sub {
+            font-size: 1.1rem;
+            color: #8892b0;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+
+        .modal .modal-sub .free-tag {
+            background: rgba(46, 204, 113, 0.15);
+            color: #2ecc71;
+            padding: 6px 22px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(46, 204, 113, 0.2);
+        }
+
+        .modal .modal-desc {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            color: #b8c0d6;
+            margin-bottom: 36px;
+            padding: 22px 28px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 18px;
+            border-left: 5px solid #f5b042;
+        }
+
+        .modal .modal-desc strong {
+            color: #f0f2f8;
+        }
+
+        .modal .modal-desc img {
+            max-width: 100%;
+            border-radius: 12px;
+            margin: 10px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            display: block;
+            pointer-events: none;
+        }
+
+        .modal .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 16px;
+            background: linear-gradient(135deg, #f5b042, #e8922a);
+            color: #0b0d11;
+            font-weight: 700;
+            font-size: 1.3rem;
+            padding: 18px 56px;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.3s;
+            text-decoration: none;
+            letter-spacing: 0.4px;
+            box-shadow: 0 10px 40px rgba(245, 176, 66, 0.35);
+        }
+
+        .modal .download-btn:hover {
+            transform: scale(1.06);
+            box-shadow: 0 16px 55px rgba(245, 176, 66, 0.5);
+        }
+
+        .modal .download-btn:active {
+            transform: scale(0.96);
+        }
+
+        .modal .download-btn svg {
+            width: 26px;
+            height: 26px;
+            fill: currentColor;
+            flex-shrink: 0;
+        }
+
+        .modal .btn-placeholder {
+            font-size: 0.9rem;
+            color: #4a536b;
+            margin-top: 18px;
+            display: block;
+            letter-spacing: 0.4px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1200px) {
+            .grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 32px;
+            }
+
+            .brand h1 {
+                font-size: 2.6rem;
+            }
+
+            .modal {
+                max-width: 720px;
+                padding: 35px 35px 40px;
+            }
+            .modal .modal-title {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .panel {
+                padding: 24px 30px 40px;
+            }
+
+            .grid {
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+                gap: 28px;
+            }
+
+            .card .card-title {
+                font-size: 1.3rem;
+            }
+            .card .card-title small {
+                font-size: 0.9rem;
+            }
+
+            .modal {
+                max-width: 650px;
+                padding: 30px 30px 35px;
+            }
+            .modal .modal-title {
+                font-size: 1.8rem;
+            }
+            .modal .modal-desc {
+                font-size: 1rem;
+                padding: 18px 22px;
+            }
+            .modal .download-btn {
+                font-size: 1.1rem;
+                padding: 16px 44px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .panel {
+                padding: 16px 16px 24px;
+                height: 100vh;
+                overflow-y: auto;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 14px;
+                margin-bottom: 24px;
+                padding-bottom: 16px;
+            }
+
+            .brand h1 {
+                font-size: 2rem;
+            }
+            .brand .sub {
+                font-size: 0.95rem;
+            }
+
+            .grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 20px;
+            }
+
+            .card {
+                padding: 18px 18px 20px;
+                border-radius: 22px;
+            }
+            .card .img-wrap {
+                aspect-ratio: 16 / 10;
+                border-radius: 16px;
+                margin-bottom: 16px;
+            }
+            .card .card-title {
+                font-size: 1.1rem;
+            }
+            .card .card-title small {
+                font-size: 0.8rem;
+            }
+            .card .click-hint {
+                font-size: 0.75rem;
+                margin-top: 12px;
+            }
+
+            .modal {
+                padding: 24px 20px 30px;
+                margin: 10px;
+                max-width: 100%;
+                border-radius: 32px;
+                max-height: 95vh;
+            }
+            .modal .modal-title {
+                font-size: 1.6rem;
+            }
+            .modal .modal-sub {
+                font-size: 0.95rem;
+            }
+            .modal .modal-desc {
+                font-size: 0.95rem;
+                padding: 16px 18px;
+            }
+            .modal .download-btn {
+                width: 100%;
+                justify-content: center;
+                font-size: 1rem;
+                padding: 14px 24px;
+            }
+            .modal .modal-img {
+                aspect-ratio: 16 / 10;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 14px;
+            }
+
+            .card {
+                padding: 12px 10px 14px;
+                border-radius: 18px;
+            }
+            .card .img-wrap {
+                aspect-ratio: 1 / 1;
+                border-radius: 14px;
+                margin-bottom: 12px;
+            }
+            .card .card-title {
+                font-size: 0.85rem;
+            }
+            .card .card-title small {
+                font-size: 0.7rem;
+                margin-top: 4px;
+            }
+            .card .click-hint {
+                display: none;
+            }
+
+            .modal .modal-title {
+                font-size: 1.3rem;
+            }
+            .modal .modal-desc {
+                font-size: 0.85rem;
+                padding: 14px 16px;
+            }
+            .modal .download-btn {
+                font-size: 0.9rem;
+                padding: 12px 20px;
+            }
+            .modal .modal-img {
+                aspect-ratio: 1 / 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="panel">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="brand">
+                <h1>By Badr-RW</h1>
+                <div class="sub">Arizona RP 2025 &bull; Free Download Panel</div>
+            </div>
+            <!-- надпись "Без регистрации" удалена -->
+        </div>
+
+        <!-- GRID -->
+        <div class="grid" id="cardGrid">
+            <!-- Карточка 1 — Мод -->
+            <div class="card" data-index="0">
+                <div class="img-wrap">
+                    <img src="Image/mod.jpg" alt="Mod Arizona RP 2025" loading="lazy" />
+                </div>
+                <div class="card-title">
+                    Mod Arizona RP 2025
+                    <small>Игровой мод</small>
+                </div>
+                <div class="click-hint">▼ нажмите</div>
+            </div>
+
+            <!-- Карточка 2 — Сайт -->
+            <div class="card" data-index="1">
+                <div class="img-wrap">
+                    <img src="Image/site.jpg" alt="Сайт Arizona RP 2025" loading="lazy" />
+                </div>
+                <div class="card-title">
+                    Сайт Arizona RP 2025
+                    <small>Веб-ресурс</small>
+                </div>
+                <div class="click-hint">▼ нажмите</div>
+            </div>
+
+            <!-- Карточка 3 — Логи -->
+            <div class="card" data-index="2">
+                <div class="img-wrap">
+                    <img src="Image/logs.png" alt="Логи Arizona RP" loading="lazy" />
+                </div>
+                <div class="card-title">
+                    Логи Arizona RP
+                    <small>Журналы событий</small>
+                </div>
+                <div class="click-hint">▼ нажмите</div>
+            </div>
+
+            <!-- Карточка 4 — Fake Online -->
+            <div class="card" data-index="3">
+                <div class="img-wrap">
+                    <img src="Image/bots.png" alt="Fake Online" loading="lazy" />
+                </div>
+                <div class="card-title">
+                    Fake Online
+                    <small>Боты / онлайнер</small>
+                </div>
+                <div class="click-hint">▼ нажмите</div>
+            </div>
+
+            <!-- Карточка 5 — Готовый проект -->
+            <div class="card" data-index="4">
+                <div class="img-wrap">
+                    <img src="Image/proekt.png" alt="Готовый проект Arizona RP OLD" loading="lazy" />
+                </div>
+                <div class="card-title">
+                    Arizona RP OLD (2022)
+                    <small>Готовый проект</small>
+                </div>
+                <div class="click-hint">▼ нажмите</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL ===== -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <button class="modal-close" id="modalClose" aria-label="Закрыть">&times;</button>
+
+            <div class="modal-img">
+                <img id="modalImage" src="" alt="" />
+            </div>
+
+            <div class="modal-title" id="modalTitle">Название</div>
+            <div class="modal-sub">
+                <span id="modalSub">Категория</span>
+                <span class="free-tag">🔥 Free</span>
+            </div>
+
+            <div class="modal-desc" id="modalDesc">
+                <strong>Описание:</strong><br />
+                Здесь будет подробное описание товара. Нажмите кнопку ниже, чтобы скачать.
+            </div>
+
+            <!-- Кнопка скачивания -->
+            <a href="#" class="download-btn" id="downloadLink" target="_blank">
+                <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                Скачать
+            </a>
+            <span class="btn-placeholder" id="placeholderText">Ссылка будет добавлена позже</span>
+        </div>
+    </div>
+
+    <script>
+        // ===== ЗАЩИТА ОТ КОПИРОВАНИЯ И ПРОСМОТРА КОДА =====
+        (function antiCopy() {
+            // Блокировка контекстного меню (правая кнопка мыши)
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+
+            // Блокировка клавиш разработчика
+            document.addEventListener('keydown', function(e) {
+                // F12
+                if (e.key === 'F12' || e.keyCode === 123) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+Shift+I (инспектор), Ctrl+Shift+J (консоль), Ctrl+Shift+C (выбор элемента)
+                if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+U (просмотр исходного кода)
+                if (e.ctrlKey && (e.key === 'u' || e.key === 'U')) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+S (сохранение страницы)
+                if (e.ctrlKey && (e.key === 's' || e.key === 'S')) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+P (печать) — иногда используют для сохранения
+                if (e.ctrlKey && (e.key === 'p' || e.key === 'P')) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+Shift+P (командная панель)
+                if (e.ctrlKey && e.shiftKey && e.key === 'P') {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+Shift+O (просмотр ресурсов)
+                if (e.ctrlKey && e.shiftKey && e.key === 'O') {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
+            // Дополнительная защита: запрет выделения текста (уже в CSS, но дублируем)
+            document.addEventListener('selectstart', function(e) {
+                e.preventDefault();
+            });
+
+            // Блокировка перетаскивания изображений (сохранение через drag)
+            document.addEventListener('dragstart', function(e) {
+                if (e.target.tagName === 'IMG') {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
+            // Отключаем возможность открыть инструменты разработчика через долгое нажатие на мобильных (не везде)
+            // и другие возможные комбинации
+            console.log('Защита включена. Копирование и просмотр кода ограничены.');
+        })();
+
+        // ===== ДАННЫЕ С ССЫЛКАМИ =====
+        const items = [{
+            title: 'Mod Arizona RP 2025',
+            sub: 'Игровой мод / клиент',
+            img: 'Image/mod.jpg',
+            desc: 'Мод Arizona RP 2025<br>Пофикшен cef<br>Можно играть с serverconnect ( будут баги )',
+            link: 'https://resource-world.ru/resources/arizona-rp-2025-Пофикшен-cef.1881/download'
+        }, {
+            title: 'Сайт Arizona RP 2025',
+            sub: 'Веб-ресурс / дизайн',
+            img: 'Image/site.jpg',
+            desc: 'Сайт Arizona RP 2025 NEW<br>Скриншоты ниже:<br><img src="Image/1.png" alt="Скриншот 1"><br><img src="Image/2.png" alt="Скриншот 2"><br><img src="Image/3.png" alt="Скриншот 3">',
+            link: 'https://resource-world.ru/resources/Слив-сайта-arizona-rp-2025-new.1882/download'
+        }, {
+            title: 'Логи Arizona RP',
+            sub: 'Журналы событий',
+            img: 'Image/logs.png',
+            desc: 'Полный архив логов сервера Arizona RP. Все события, действия игроков, админ-логи и системные сообщения за последние периоды.',
+            link: 'https://resource-world.ru/resources/Слив-Логов-arizona-rp.1883/download'
+        }, {
+            title: 'Fake Online',
+            sub: 'Боты / онлайнер',
+            img: 'Image/bots.png',
+            desc: 'Программа для создания фейкового онлайна на сервере. Настройка количества ботов, их поведения и времени активности.',
+            link: 'https://resource-world.ru/resources/fakeonline-накручиваем-онлайн-на-сервер.1828/download'
+        }, {
+            title: 'Arizona RP OLD (2022)',
+            sub: 'Готовый проект',
+            img: 'Image/proekt.png',
+            desc: 'Что входит в Готовый проект?<br>Мод Arizona RP 2022 SER<br>Сайт Arizona RP OLD<br>Логи Arizona RP',
+            link: '#' // ссылка на готовый проект будет добавлена позже
+        }];
+
+        // ===== DOM =====
+        const overlay = document.getElementById('modalOverlay');
+        const closeBtn = document.getElementById('modalClose');
+        const modalImg = document.getElementById('modalImage');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalSub = document.getElementById('modalSub');
+        const modalDesc = document.getElementById('modalDesc');
+        const downloadLink = document.getElementById('downloadLink');
+        const placeholderText = document.getElementById('placeholderText');
+
+        // ===== ОТКРЫТЬ МОДАЛКУ =====
+        function openModal(index) {
+            const item = items[index];
+            if (!item) return;
+
+            modalImg.src = item.img;
+            modalImg.alt = item.title;
+            modalTitle.textContent = item.title;
+            modalSub.textContent = item.sub;
+            modalDesc.innerHTML = `<strong>Описание:</strong><br />${item.desc}`;
+            downloadLink.href = item.link;
+
+            // Если ссылка — заглушка, меняем текст плейсхолдера и делаем кнопку неактивной
+            if (item.link === '#' || item.link === '') {
+                placeholderText.textContent = 'Ссылка на скачивание появится позже';
+                downloadLink.style.opacity = '0.7';
+                downloadLink.style.cursor = 'default';
+                downloadLink.style.pointerEvents = 'none';
+            } else {
+                placeholderText.textContent = 'Нажмите, чтобы скачать';
+                downloadLink.style.opacity = '1';
+                downloadLink.style.cursor = 'pointer';
+                downloadLink.style.pointerEvents = 'auto';
+            }
+
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // ===== ЗАКРЫТЬ МОДАЛКУ =====
+        function closeModal() {
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // ===== СОБЫТИЯ =====
+        document.querySelectorAll('.card').forEach((card) => {
+            card.addEventListener('click', () => {
+                const idx = parseInt(card.dataset.index, 10);
+                if (!isNaN(idx)) openModal(idx);
+            });
+        });
+
+        closeBtn.addEventListener('click', closeModal);
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) closeModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+
+</body>
+</html>
