@@ -33,7 +33,7 @@
             width: 100vw;
             height: 100vh;
             background: linear-gradient(145deg, #25293c 0%, #2e3248 100%);
-            padding: 30px 50px 50px;
+            padding: 30px 50px 20px;
             display: flex;
             flex-direction: column;
             overflow-y: auto;
@@ -45,7 +45,7 @@
             flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             padding-bottom: 22px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.07);
             flex-shrink: 0;
@@ -66,12 +66,42 @@
             letter-spacing: 0.5px;
         }
 
-        /* ===== GRID — КРУПНЫЕ КАРТОЧКИ ===== */
+        .header-actions {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .info-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #c8d0e6;
+            padding: 10px 28px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s, border-color 0.3s, transform 0.2s;
+            letter-spacing: 0.3px;
+            backdrop-filter: blur(4px);
+        }
+
+        .info-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(245, 176, 66, 0.3);
+            transform: scale(1.02);
+        }
+
+        .info-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* ===== GRID ===== */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
             gap: 40px;
-            flex: 1;
+            flex: 1 1 auto;
             align-content: start;
         }
 
@@ -154,6 +184,34 @@
             letter-spacing: 0.3px;
         }
 
+        .card .card-title .badge-dev {
+            display: inline-block;
+            background: rgba(245, 176, 66, 0.15);
+            color: #f5b042;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 2px 14px;
+            border-radius: 30px;
+            margin-top: 8px;
+            border: 1px solid rgba(245, 176, 66, 0.15);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .card .card-title .badge-paid {
+            display: inline-block;
+            background: rgba(46, 204, 113, 0.15);
+            color: #2ecc71;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 2px 14px;
+            border-radius: 30px;
+            margin-top: 8px;
+            border: 1px solid rgba(46, 204, 113, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
         .card .click-hint {
             font-size: 0.9rem;
             color: #4a536b;
@@ -171,7 +229,7 @@
             color: #f5b042;
         }
 
-        /* ===== MODAL ===== */
+        /* ===== MODAL (товары) ===== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -298,6 +356,18 @@
             border: 1px solid rgba(46, 204, 113, 0.2);
         }
 
+        .modal .modal-sub .paid-tag {
+            background: rgba(245, 176, 66, 0.15);
+            color: #f5b042;
+            padding: 6px 22px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(245, 176, 66, 0.2);
+        }
+
         .modal .modal-desc {
             font-size: 1.15rem;
             line-height: 1.8;
@@ -364,17 +434,113 @@
             letter-spacing: 0.4px;
         }
 
+        /* ===== INFO MODAL ===== */
+        .info-content {
+            text-align: left;
+            padding: 10px 0;
+        }
+
+        .info-content h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #f0f2f8;
+            margin-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 12px;
+        }
+
+        .info-content p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #b8c0d6;
+            margin-bottom: 14px;
+        }
+
+        .info-content .dev-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0 0;
+        }
+
+        .info-content .dev-list li {
+            font-size: 1.1rem;
+            padding: 10px 16px;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #f5b042;
+            color: #d0d8ee;
+        }
+
+        .info-content .dev-list li strong {
+            color: #f0f2f8;
+        }
+
+        .info-content .badge-dev-big {
+            display: inline-block;
+            background: rgba(245, 176, 66, 0.12);
+            color: #f5b042;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 4px 18px;
+            border-radius: 40px;
+            border: 1px solid rgba(245, 176, 66, 0.15);
+            margin-top: 6px;
+        }
+
+        .info-content .badge-paid-big {
+            display: inline-block;
+            background: rgba(46, 204, 113, 0.12);
+            color: #2ecc71;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 4px 18px;
+            border-radius: 40px;
+            border: 1px solid rgba(46, 204, 113, 0.2);
+            margin-top: 6px;
+        }
+
+        /* ===== FOOTER WIDGET — белый фон ===== */
+        .footer-widget {
+            flex-shrink: 0;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .footer-widget div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #ffffff;
+            padding: 10px 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .footer-widget div a {
+            color: #000000 !important;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .footer-widget div a:hover {
+            text-decoration: underline;
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1200px) {
             .grid {
                 grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
                 gap: 32px;
             }
-
             .brand h1 {
                 font-size: 2.6rem;
             }
-
             .modal {
                 max-width: 720px;
                 padding: 35px 35px 40px;
@@ -386,21 +552,18 @@
 
         @media (max-width: 992px) {
             .panel {
-                padding: 24px 30px 40px;
+                padding: 24px 30px 20px;
             }
-
             .grid {
                 grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
                 gap: 28px;
             }
-
             .card .card-title {
                 font-size: 1.3rem;
             }
             .card .card-title small {
                 font-size: 0.9rem;
             }
-
             .modal {
                 max-width: 650px;
                 padding: 30px 30px 35px;
@@ -416,15 +579,21 @@
                 font-size: 1.1rem;
                 padding: 16px 44px;
             }
+            .header-actions {
+                gap: 12px;
+            }
+            .info-btn {
+                padding: 8px 20px;
+                font-size: 0.9rem;
+            }
         }
 
         @media (max-width: 768px) {
             .panel {
-                padding: 16px 16px 24px;
+                padding: 16px 16px 16px;
                 height: 100vh;
                 overflow-y: auto;
             }
-
             .header {
                 flex-direction: column;
                 align-items: flex-start;
@@ -432,19 +601,24 @@
                 margin-bottom: 24px;
                 padding-bottom: 16px;
             }
-
             .brand h1 {
                 font-size: 2rem;
             }
             .brand .sub {
                 font-size: 0.95rem;
             }
-
+            .header-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            .info-btn {
+                font-size: 0.85rem;
+                padding: 8px 18px;
+            }
             .grid {
                 grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
                 gap: 20px;
             }
-
             .card {
                 padding: 18px 18px 20px;
                 border-radius: 22px;
@@ -464,7 +638,6 @@
                 font-size: 0.75rem;
                 margin-top: 12px;
             }
-
             .modal {
                 padding: 24px 20px 30px;
                 margin: 10px;
@@ -491,6 +664,26 @@
             .modal .modal-img {
                 aspect-ratio: 16 / 10;
             }
+            .footer-widget {
+                margin-top: 20px;
+                padding-top: 14px;
+            }
+            .footer-widget div {
+                padding: 8px 12px;
+                border-radius: 12px;
+            }
+            .footer-widget div a {
+                font-size: 0.85rem;
+            }
+            .info-content h2 {
+                font-size: 1.8rem;
+            }
+            .info-content p {
+                font-size: 1rem;
+            }
+            .info-content .dev-list li {
+                font-size: 1rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -498,7 +691,6 @@
                 grid-template-columns: repeat(2, 1fr);
                 gap: 14px;
             }
-
             .card {
                 padding: 12px 10px 14px;
                 border-radius: 18px;
@@ -518,7 +710,6 @@
             .card .click-hint {
                 display: none;
             }
-
             .modal .modal-title {
                 font-size: 1.3rem;
             }
@@ -533,6 +724,19 @@
             .modal .modal-img {
                 aspect-ratio: 1 / 1;
             }
+            .info-content h2 {
+                font-size: 1.4rem;
+            }
+            .info-content .dev-list li {
+                font-size: 0.9rem;
+                padding: 8px 12px;
+            }
+            .footer-widget div {
+                padding: 6px 10px;
+            }
+            .footer-widget div a {
+                font-size: 0.75rem;
+            }
         }
     </style>
 </head>
@@ -545,7 +749,9 @@
                 <h1>By Badr-RW</h1>
                 <div class="sub">Arizona RP 2025 &bull; Free Download Panel</div>
             </div>
-            <!-- надпись "Без регистрации" удалена -->
+            <div class="header-actions">
+                <button class="info-btn" id="infoBtn">ℹ️ Информация</button>
+            </div>
         </div>
 
         <!-- GRID -->
@@ -598,7 +804,7 @@
                 <div class="click-hint">▼ нажмите</div>
             </div>
 
-            <!-- Карточка 5 — Готовый проект -->
+            <!-- Карточка 5 — Готовый проект (в разработке) -->
             <div class="card" data-index="4">
                 <div class="img-wrap">
                     <img src="Image/proekt.png" alt="Готовый проект Arizona RP OLD" loading="lazy" />
@@ -606,13 +812,60 @@
                 <div class="card-title">
                     Arizona RP OLD (2022)
                     <small>Готовый проект</small>
+                    <div class="badge-dev">В разработке</div>
+                </div>
+                <div class="click-hint">▼ нажмите</div>
+            </div>
+
+            <!-- Карточка 6 — Замена ссылок и названий (скоро в продаже, платно) -->
+            <div class="card" data-index="5">
+                <div class="img-wrap">
+                    <img src="Image/yo.jpeg" alt="Замена ссылок и названий" loading="lazy" />
+                </div>
+                <div class="card-title">
+                    Замена ссылок и названий
+                    <small>в моде</small>
+                    <div class="badge-paid">💰 Скоро в продаже</div>
+                </div>
+                <div class="click-hint">▼ нажмите</div>
+            </div>
+
+            <!-- Карточка 7 — Установка мода на хостинг (скоро в продаже, платно) -->
+            <div class="card" data-index="6">
+                <div class="img-wrap">
+                    <img src="Image/мод.png" alt="Установка мода на хостинг" loading="lazy" />
+                </div>
+                <div class="card-title">
+                    Установка мода
+                    <small>на хостинг (SAMP)</small>
+                    <div class="badge-paid">💰 Скоро в продаже</div>
+                </div>
+                <div class="click-hint">▼ нажмите</div>
+            </div>
+
+            <!-- Новая карточка 8 — Сайт Arizona RP 2022 -->
+            <div class="card" data-index="7">
+                <div class="img-wrap">
+                    <img src="Image/image%20(2).jpeg" alt="Сайт Arizona RP 2022" loading="lazy" />
+                </div>
+                <div class="card-title">
+                    Сайт Arizona RP 2022
+                    <small>Веб-ресурс</small>
                 </div>
                 <div class="click-hint">▼ нажмите</div>
             </div>
         </div>
+
+        <!-- ===== FOOTER: СЧЁТЧИК ДО ЗИМЫ (НОВОГО ГОДА) С БЕЛЫМ ФОНОМ ===== -->
+        <div class="footer-widget">
+            <div>
+                <a href="https://allcalc.ru/node/1868" data-weight="450px" data-height="400px">Сколько дней осталось до нового года - allcalc</a>
+                <script src="https://allcalc.ru/widgets/script.js"></script>
+            </div>
+        </div>
     </div>
 
-    <!-- ===== MODAL ===== -->
+    <!-- ===== MODAL ДЛЯ ТОВАРОВ ===== -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal">
             <button class="modal-close" id="modalClose" aria-label="Закрыть">&times;</button>
@@ -624,7 +877,7 @@
             <div class="modal-title" id="modalTitle">Название</div>
             <div class="modal-sub">
                 <span id="modalSub">Категория</span>
-                <span class="free-tag">🔥 Free</span>
+                <span class="free-tag" id="modalPriceTag">🔥 Free</span>
             </div>
 
             <div class="modal-desc" id="modalDesc">
@@ -632,7 +885,6 @@
                 Здесь будет подробное описание товара. Нажмите кнопку ниже, чтобы скачать.
             </div>
 
-            <!-- Кнопка скачивания -->
             <a href="#" class="download-btn" id="downloadLink" target="_blank">
                 <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
                 Скачать
@@ -641,84 +893,82 @@
         </div>
     </div>
 
+    <!-- ===== MODAL ДЛЯ ИНФОРМАЦИИ ===== -->
+    <div class="modal-overlay" id="infoModalOverlay">
+        <div class="modal">
+            <button class="modal-close" id="infoModalClose" aria-label="Закрыть">&times;</button>
+            <div class="info-content">
+                <h2>ℹ️ Информация</h2>
+                <p><strong>Разработчик:</strong> Badr</p>
+                <p>
+                    <span class="badge-dev-big">В разработке</span>
+                    <span class="badge-paid-big" style="margin-left:10px;">💰 Скоро в продаже</span>
+                </p>
+                <ul class="dev-list">
+                    <li><strong>Готовый проект</strong> — Arizona RP OLD (2022) <span class="badge-dev" style="font-size:0.7rem;margin-left:10px;">В разработке</span></li>
+                    <li><strong>Замена ссылок и названий</strong> в моде <span class="badge-paid" style="font-size:0.7rem;margin-left:10px;">💰 Скоро в продаже</span></li>
+                    <li><strong>Установка мода на хостинг</strong> (SAMP) <span class="badge-paid" style="font-size:0.7rem;margin-left:10px;">💰 Скоро в продаже</span></li>
+                </ul>
+                <p style="margin-top:24px; color:#8892b0; font-size:0.95rem;">
+                    Все бесплатные материалы предоставлены как есть. Платные услуги будут доступны после запуска.
+                </p>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ====================================================
-        //   КЛИЕНТСКИЙ АНТИ-DDOS (защита от флуда и атак)
+        //   КЛИЕНТСКИЙ АНТИ-DDOS
         // ====================================================
         (function antiDDoS() {
-            // === 1. Защита от множественных кликов (rate limiting) ===
-            // Разрешаем не более 5 действий за 10 секунд.
-            // При превышении блокируем на 30 секунд.
-            const LIMIT = 5;              // максимум действий
-            const WINDOW = 10000;         // 10 секунд
-            const BAN_TIME = 30000;       // 30 секунд бана
+            const LIMIT = 5;
+            const WINDOW = 10000;
+            const BAN_TIME = 30000;
 
             let actionTimestamps = [];
             let isBanned = false;
             let banTimer = null;
 
-            // Функция проверки и регистрации действия
             function checkAndRegisterAction() {
                 const now = Date.now();
+                if (isBanned) return false;
 
-                // Если в бане — отклоняем
-                if (isBanned) {
-                    // Можно показать предупреждение, но чтобы не раздражать, просто игнорируем
-                    // Возвращаем false, чтобы заблокировать действие
-                    return false;
-                }
-
-                // Очищаем старые записи
                 actionTimestamps = actionTimestamps.filter(ts => now - ts < WINDOW);
-
-                // Проверяем, не превышен ли лимит
                 if (actionTimestamps.length >= LIMIT) {
-                    // Превышение -> бан
                     isBanned = true;
                     if (banTimer) clearTimeout(banTimer);
                     banTimer = setTimeout(() => {
                         isBanned = false;
                         actionTimestamps = [];
                         banTimer = null;
-                        console.log('Анти-DDoS: бан снят, можно снова кликать.');
                     }, BAN_TIME);
 
-                    // Показываем предупреждение (только один раз, чтобы не заспамить)
                     if (!window._ddosWarningShown) {
                         window._ddosWarningShown = true;
-                        alert('⚠️ Превышена частота запросов. Доступ заблокирован на 30 секунд для защиты от DDoS.');
+                        alert('⚠️ Превышена частота запросов. Доступ заблокирован на 30 секунд.');
                         setTimeout(() => { window._ddosWarningShown = false; }, 5000);
                     }
                     return false;
                 }
-
-                // Регистрируем действие
                 actionTimestamps.push(now);
                 return true;
             }
 
-            // === 2. Защита от быстрых повторных кликов по одной кнопке (debounce) ===
-            // Ограничиваем частоту открытия модальных окон (не чаще 1 раза в 500 мс)
             let lastModalOpen = 0;
-            const MODAL_COOLDOWN = 500; // 0.5 секунды
+            const MODAL_COOLDOWN = 500;
 
             function canOpenModal() {
                 const now = Date.now();
-                if (now - lastModalOpen < MODAL_COOLDOWN) {
-                    return false;
-                }
+                if (now - lastModalOpen < MODAL_COOLDOWN) return false;
                 lastModalOpen = now;
                 return true;
             }
 
-            // === 3. Защита от перезагрузки страницы (F5) через localStorage ===
-            // Если страница обновляется чаще 1 раза в 5 секунд — блокируем
-            const RELOAD_LIMIT = 5000; // 5 секунд
+            const RELOAD_LIMIT = 5000;
             const lastReloadKey = 'lastReloadTime';
             const lastReload = localStorage.getItem(lastReloadKey);
             const now = Date.now();
             if (lastReload && (now - parseInt(lastReload, 10)) < RELOAD_LIMIT) {
-                // Слишком частая перезагрузка — блокируем страницу
                 document.body.innerHTML = `
                     <div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#25293c;color:#fff;font-size:2rem;text-align:center;padding:20px;">
                         <div>
@@ -728,64 +978,78 @@
                         </div>
                     </div>
                 `;
-                // Также блокируем все скрипты, чтобы не было лишних действий
                 throw new Error('Too many reloads');
             }
             localStorage.setItem(lastReloadKey, now.toString());
 
-            // === 4. Защита от открытия большого количества вкладок (опционально) ===
-            // Можно ограничить количество окон через localStorage, но это не надёжно.
-            // Пропустим, чтобы не мешать пользователю.
-
-            // === 5. Предотвращение автоматических скриптов через проверку на бота ===
-            // Простая проверка: если событие клика сгенерировано программно (isTrusted === false), блокируем.
-            // Это работает только для кликов, но мы можем добавить проверку в обработчике.
-
-            // Сохраняем функции в глобальный объект для использования в обработчиках
             window.__ddos = {
                 checkAndRegisterAction: checkAndRegisterAction,
                 canOpenModal: canOpenModal,
                 isBanned: () => isBanned
             };
-
-            console.log('Анти-DDoS защита активирована.');
         })();
 
         // ====================================================
-        //   ОСНОВНОЙ СКРИПТ ПАНЕЛИ
+        //   ОСНОВНОЙ СКРИПТ
         // ====================================================
 
-        // ===== ДАННЫЕ С ССЫЛКАМИ =====
+        // ===== ДАННЫЕ =====
         const items = [{
             title: 'Mod Arizona RP 2025',
             sub: 'Игровой мод / клиент',
             img: 'Image/mod.jpg',
             desc: 'Мод Arizona RP 2025<br>Пофикшен cef<br>Можно играть с serverconnect ( будут баги )',
-            link: 'https://resource-world.ru/resources/arizona-rp-2025-Пофикшен-cef.1881/download'
+            link: 'https://resource-world.ru/resources/arizona-rp-2025-Пофикшен-cef.1881/download',
+            priceTag: 'free'
         }, {
             title: 'Сайт Arizona RP 2025',
             sub: 'Веб-ресурс / дизайн',
             img: 'Image/site.jpg',
             desc: 'Сайт Arizona RP 2025 NEW<br>Скриншоты ниже:<br><img src="Image/1.png" alt="Скриншот 1"><br><img src="Image/2.png" alt="Скриншот 2"><br><img src="Image/3.png" alt="Скриншот 3">',
-            link: 'https://resource-world.ru/resources/Слив-сайта-arizona-rp-2025-new.1882/download'
+            link: 'https://resource-world.ru/resources/Слив-сайта-arizona-rp-2025-new.1882/download',
+            priceTag: 'free'
         }, {
             title: 'Логи Arizona RP',
             sub: 'Журналы событий',
             img: 'Image/logs.png',
             desc: 'Полный архив логов сервера Arizona RP. Все события, действия игроков, админ-логи и системные сообщения за последние периоды.',
-            link: 'https://resource-world.ru/resources/Слив-Логов-arizona-rp.1883/download'
+            link: 'https://resource-world.ru/resources/Слив-Логов-arizona-rp.1883/download',
+            priceTag: 'free'
         }, {
             title: 'Fake Online',
             sub: 'Боты / онлайнер',
             img: 'Image/bots.png',
             desc: 'Программа для создания фейкового онлайна на сервере. Настройка количества ботов, их поведения и времени активности.',
-            link: 'https://resource-world.ru/resources/fakeonline-накручиваем-онлайн-на-сервер.1828/download'
+            link: 'https://resource-world.ru/resources/fakeonline-накручиваем-онлайн-на-сервер.1828/download',
+            priceTag: 'free'
         }, {
             title: 'Arizona RP OLD (2022)',
             sub: 'Готовый проект',
             img: 'Image/proekt.png',
-            desc: 'Что входит в Готовый проект?<br>Мод Arizona RP 2022 SER<br>Сайт Arizona RP OLD<br>Логи Arizona RP',
-            link: '#' // ссылка на готовый проект будет добавлена позже
+            desc: 'Что входит в Готовый проект?<br>Мод Arizona RP 2022 SER<br>Сайт Arizona RP OLD<br>Логи Arizona RP<br><br><strong>⚠️ В разработке</strong> — ссылка появится позже.',
+            link: '#',
+            priceTag: 'dev'
+        }, {
+            title: 'Замена ссылок и названий',
+            sub: 'в моде',
+            img: 'Image/yo.jpeg',
+            desc: 'Замена ссылок и названий в моде<br><br><strong>💰 Скоро в продаже (платно)</strong> — подробности появятся позже.',
+            link: '#',
+            priceTag: 'paid'
+        }, {
+            title: 'Установка мода на хостинг',
+            sub: 'SAMP',
+            img: 'Image/мод.png',
+            desc: 'Установка мода на хостинг ( SAMP )<br><br><strong>💰 Скоро в продаже (платно)</strong> — подробности появятся позже.',
+            link: '#',
+            priceTag: 'paid'
+        }, {
+            title: 'Сайт Arizona RP 2022',
+            sub: 'Веб-ресурс / дизайн',
+            img: 'Image/image%20(2).jpeg',
+            desc: 'Готовый сайт для Arizona RP 2022 года. Включает все необходимые файлы для запуска.<br>Адаптивный дизайн, панель администратора и интеграция с игрой.',
+            link: 'https://disk.yandex.ru/d/Dml0wwWu93d9Kg',
+            priceTag: 'free'
         }];
 
         // ===== DOM =====
@@ -795,21 +1059,18 @@
         const modalTitle = document.getElementById('modalTitle');
         const modalSub = document.getElementById('modalSub');
         const modalDesc = document.getElementById('modalDesc');
+        const modalPriceTag = document.getElementById('modalPriceTag');
         const downloadLink = document.getElementById('downloadLink');
         const placeholderText = document.getElementById('placeholderText');
 
-        // ===== ОТКРЫТЬ МОДАЛКУ С ЗАЩИТОЙ =====
-        function openModal(index) {
-            // === Анти-DDoS: проверка лимита кликов ===
-            if (!window.__ddos.checkAndRegisterAction()) {
-                // Превышен лимит или бан — игнорируем
-                return;
-            }
+        const infoOverlay = document.getElementById('infoModalOverlay');
+        const infoCloseBtn = document.getElementById('infoModalClose');
+        const infoBtn = document.getElementById('infoBtn');
 
-            // === Анти-DDoS: защита от быстрых повторных открытий ===
-            if (!window.__ddos.canOpenModal()) {
-                return;
-            }
+        // ===== ОТКРЫТЬ ТОВАР =====
+        function openModal(index) {
+            if (!window.__ddos.checkAndRegisterAction()) return;
+            if (!window.__ddos.canOpenModal()) return;
 
             const item = items[index];
             if (!item) return;
@@ -818,10 +1079,25 @@
             modalImg.alt = item.title;
             modalTitle.textContent = item.title;
             modalSub.textContent = item.sub;
+
+            // Устанавливаем тег цены
+            if (item.priceTag === 'free') {
+                modalPriceTag.textContent = '🔥 Free';
+                modalPriceTag.className = 'free-tag';
+            } else if (item.priceTag === 'paid') {
+                modalPriceTag.textContent = '💰 Платно';
+                modalPriceTag.className = 'paid-tag';
+            } else {
+                modalPriceTag.textContent = '⏳ В разработке';
+                modalPriceTag.className = 'free-tag';
+                modalPriceTag.style.borderColor = 'rgba(245,176,66,0.2)';
+                modalPriceTag.style.color = '#f5b042';
+                modalPriceTag.style.background = 'rgba(245,176,66,0.12)';
+            }
+
             modalDesc.innerHTML = `<strong>Описание:</strong><br />${item.desc}`;
             downloadLink.href = item.link;
 
-            // Если ссылка — заглушка, меняем текст плейсхолдера и делаем кнопку неактивной
             if (item.link === '#' || item.link === '') {
                 placeholderText.textContent = 'Ссылка на скачивание появится позже';
                 downloadLink.style.opacity = '0.7';
@@ -838,20 +1114,30 @@
             document.body.style.overflow = 'hidden';
         }
 
-        // ===== ЗАКРЫТЬ МОДАЛКУ =====
+        // ===== ЗАКРЫТЬ ТОВАР =====
         function closeModal() {
             overlay.classList.remove('active');
             document.body.style.overflow = '';
         }
 
+        // ===== ОТКРЫТЬ ИНФОРМАЦИЮ =====
+        function openInfoModal() {
+            if (!window.__ddos.checkAndRegisterAction()) return;
+            if (!window.__ddos.canOpenModal()) return;
+            infoOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // ===== ЗАКРЫТЬ ИНФОРМАЦИЮ =====
+        function closeInfoModal() {
+            infoOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
         // ===== СОБЫТИЯ =====
-        // Обработчик кликов по карточкам с проверкой на программный клик
         document.querySelectorAll('.card').forEach((card) => {
             card.addEventListener('click', function(e) {
-                // Защита от программных кликов (скриптов)
-                if (!e.isTrusted) {
-                    return;
-                }
+                if (!e.isTrusted) return;
                 const idx = parseInt(this.dataset.index, 10);
                 if (!isNaN(idx)) openModal(idx);
             });
@@ -861,13 +1147,19 @@
         overlay.addEventListener('click', (e) => {
             if (e.target === overlay) closeModal();
         });
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
+
+        infoBtn.addEventListener('click', openInfoModal);
+        infoCloseBtn.addEventListener('click', closeInfoModal);
+        infoOverlay.addEventListener('click', (e) => {
+            if (e.target === infoOverlay) closeInfoModal();
         });
 
-        // ===== ДОПОЛНИТЕЛЬНАЯ ЗАЩИТА: блокировка автоматических скриптов через MutationObserver =====
-        // Если кто-то пытается вставить скрипт или изменить DOM — можно предупредить,
-        // но для простоты оставим так.
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (overlay.classList.contains('active')) closeModal();
+                if (infoOverlay.classList.contains('active')) closeInfoModal();
+            }
+        });
 
         console.log('Панель загружена. Защита активна.');
     </script>
