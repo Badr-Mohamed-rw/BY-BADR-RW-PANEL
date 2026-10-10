@@ -382,6 +382,8 @@ app.use('/api', function (req, res) {
     res.status(404).json({ ok: false, error: 'Неизвестное действие' });
 });
 
+app.use('/data/chat-photos', express.static(path.join(__dirname, 'data', 'chat-photos')));
+
 app.use(express.static(__dirname, { index: 'index.html' }));
 
 app.listen(PORT, function () {
