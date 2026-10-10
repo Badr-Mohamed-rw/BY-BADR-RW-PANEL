@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
     var CONSENT_KEY = 'cookie_consent';
 
     function init() {

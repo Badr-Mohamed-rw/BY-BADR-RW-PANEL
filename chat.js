@@ -1,273 +1,57 @@
-/* chat.js — клиент чата */
-(function () {
-    'use strict';
-
-    var els = {
-        list: document.getElementById('chatList'),
-        form: document.getElementById('chatForm'),
-        input: document.getElementById('chatInput'),
-        file: document.getElementById('chatFile'),
-        preview: document.getElementById('chatPreview'),
-        previewImg: document.getElementById('chatPreviewImg'),
-        previewRemove: document.getElementById('chatPreviewRemove'),
-        replyBox: document.getElementById('chatReplyBox'),
-        replyNick: document.getElementById('chatReplyNick'),
-        replyText: document.getElementById('chatReplyText'),
-        replyCancel: document.getElementById('chatReplyCancel'),
-        online: document.getElementById('chatOnline'),
-        meNick: document.getElementById('chatMeNick'),
-        changeNick: document.getElementById('chatChangeNick'),
-        send: document.getElementById('chatSendBtn'),
-        status: document.getElementById('chatStatus')
-    };
-
-    if (!els.list) return;
-
-    var state = {
-        me: null,
-        messages: [],
-        lastId: '',
-        replyTo: null,
-        photo: null,
-        pollingTimer: null,
-        heartbeatTimer: null
-    };
-
-    function esc(s) {
-        return String(s == null ? '' : s)
-            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
-
-    function api(url, opts) {
-        return fetch(url, opts || {}).then(function (r) { return r.json(); });
-    }
-
-    function form(fields) {
-        var fd = new FormData();
-        for (var k in fields) if (fields[k] != null) fd.append(k, fields[k]);
-        return fd;
-    }
-
-    // ===== Рендер сообщения =====
-    function renderMsg(m) {
-        var div = document.createElement('div');
-        div.className = 'chat-msg' + (m.isAdmin ? ' chat-msg-admin' : '');
-        div.dataset.id = m.id;
-
-        var avatar = document.createElement('div');
-        avatar.className = 'chat-msg-avatar';
-        avatar.textContent = (m.nickname || '?').charAt(0).toUpperCase();
-        if (m.isAdmin) avatar.classList.add('chat-msg-avatar-admin');
-
-        var body = document.createElement('div');
-        body.className = 'chat-msg-body';
-
-        var head = document.createElement('div');
-        head.className = 'chat-msg-head';
-        var nick = document.createElement('span');
-        nick.className = 'chat-msg-nick';
-        nick.textContent = m.nickname;
-        head.appendChild(nick);
-        if (m.isAdmin) {
-            var check = document.createElement('span');
-            check.className = 'chat-msg-check';
-            check.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
-            check.title = 'Администратор';
-            head.appendChild(check);
-        }
-        var time = document.createElement('span');
-        time.className = 'chat-msg-time';
-        time.textContent = (m.created_at || '').slice(11, 16);
-        head.appendChild(time);
-        body.appendChild(head);
-
-        if (m.replyTo) {
-            var rep = document.createElement('div');
-            rep.className = 'chat-msg-reply';
-            rep.innerHTML = '<b>' + esc(m.replyTo.nickname) + '</b> ' + esc(m.replyTo.text);
-            body.appendChild(rep);
-        }
-
-        if (m.text) {
-            var txt = document.createElement('div');
-            txt.className = 'chat-msg-text';
-            txt.textContent = m.text;
-            body.appendChild(txt);
-        }
-
-        if (m.photo) {
-            var imgWrap = document.createElement('a');
-            imgWrap.className = 'chat-msg-photo';
-            imgWrap.href = m.photo;
-            imgWrap.target = '_blank';
-            imgWrap.rel = 'noopener';
-            var img = document.createElement('img');
-            img.src = m.photo;
-            img.alt = 'photo';
-            img.loading = 'lazy';
-            imgWrap.appendChild(img);
-            body.appendChild(imgWrap);
-        }
-
-        var actions = document.createElement('div');
-        actions.className = 'chat-msg-actions';
-        var replyBtn = document.createElement('button');
-        replyBtn.type = 'button';
-        replyBtn.className = 'chat-msg-reply-btn';
-        replyBtn.textContent = 'Ответить';
-        replyBtn.onclick = function () { setReply(m); };
-        actions.appendChild(replyBtn);
-        body.appendChild(actions);
-
-        div.appendChild(avatar);
-        div.appendChild(body);
-        return div;
-    }
-
-    function appendMessages(list) {
-        var atBottom = els.list.scrollHeight - els.list.scrollTop - els.list.clientHeight < 80;
-        list.forEach(function (m) {
-            if (state.messages.some(x => x.id === m.id)) return;
-            state.messages.push(m);
-            els.list.appendChild(renderMsg(m));
-        });
-        if (atBottom) els.list.scrollTop = els.list.scrollHeight;
-    }
-
-    // ===== Пинг =====
-    function heartbeat() {
-        api('/api/chat/heartbeat', { method: 'POST' }).then(function (r) {
-            if (r.ok) {
-                if (els.online) els.online.textContent = r.online;
-                state.me = r.me;
-                if (els.meNick) els.meNick.textContent = r.me.nickname;
-            }
-        }).catch(function () {});
-    }
-
-    // ===== Поллинг =====
-    function poll() {
-        var url = '/api/chat/messages' + (state.lastId ? '?since=' + encodeURIComponent(state.lastId) : '');
-        api(url).then(function (r) {
-            if (r.ok && r.messages.length) {
-                appendMessages(r.messages);
-                state.lastId = r.messages[r.messages.length - 1].id;
-            }
-        }).catch(function () {});
-    }
-
-    // ===== Reply =====
-    function setReply(m) {
-        state.replyTo = m;
-        els.replyBox.style.display = 'flex';
-        els.replyNick.textContent = m.nickname;
-        els.replyText.textContent = (m.text || '').slice(0, 80) || '📷 фото';
-        els.input.focus();
-    }
-
-    function clearReply() {
-        state.replyTo = null;
-        els.replyBox.style.display = 'none';
-    }
-
-    // ===== Фото =====
-    els.file.addEventListener('change', function () {
-        var f = els.file.files[0];
-        if (!f) return;
-        if (f.size > 5 * 1024 * 1024) {
-            alert('Фото больше 5 МБ');
-            els.file.value = '';
-            return;
-        }
-        var reader = new FileReader();
-        reader.onload = function (e) {
-            state.photo = e.target.result;
-            els.previewImg.src = state.photo;
-            els.preview.style.display = 'flex';
-        };
-        reader.readAsDataURL(f);
-    });
-
-    els.previewRemove.addEventListener('click', function () {
-        state.photo = null;
-        els.file.value = '';
-        els.preview.style.display = 'none';
-    });
-
-    // ===== Смена ника =====
-    els.changeNick.addEventListener('click', function () {
-        if (state.me && state.me.isAdmin) {
-            alert('Ты админ, ник фиксирован: Badr');
-            return;
-        }
-        var cur = state.me ? state.me.nickname : '';
-        var nick = prompt('Введи новый ник (2-24 символа):', cur);
-        if (!nick) return;
-        nick = nick.trim();
-        if (nick.length < 2) { alert('Минимум 2 символа'); return; }
-        api('/api/chat/set-nickname', { method: 'POST', body: form({ nickname: nick }) })
-            .then(function (r) {
-                if (r.ok) {
-                    state.me.nickname = r.nickname;
-                    if (els.meNick) els.meNick.textContent = r.nickname;
-                    alert('Ник изменён: ' + r.nickname);
-                } else {
-                    alert(r.error || 'Ошибка');
-                }
-            }).catch(function () { alert('Ошибка сети'); });
-    });
-
-    // ===== Отправка =====
-    els.form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        var text = els.input.value.trim();
-        if (!text && !state.photo) return;
-
-        els.send.disabled = true;
-        els.status.textContent = 'Отправка...';
-
-        var payload = { text: text };
-        if (state.photo) payload.photo = state.photo;
-        if (state.replyTo) payload.replyTo = state.replyTo.id;
-
-        api('/api/chat/send', { method: 'POST', body: form(payload) })
-            .then(function (r) {
-                els.send.disabled = false;
-                if (r.ok) {
-                    els.input.value = '';
-                    els.status.textContent = '';
-                    state.photo = null;
-                    els.file.value = '';
-                    els.preview.style.display = 'none';
-                    clearReply();
-                    state.messages.push(r.message);
-                    els.list.appendChild(renderMsg(r.message));
-                    els.list.scrollTop = els.list.scrollHeight;
-                    state.lastId = r.message.id;
-                } else {
-                    els.status.textContent = r.error || 'Ошибка';
-                }
-            })
-            .catch(function () {
-                els.send.disabled = false;
-                els.status.textContent = 'Ошибка сети';
-            });
-    });
-
-    els.replyCancel.addEventListener('click', clearReply);
-
-    // Enter отправляет, Shift+Enter переносит строку
-    els.input.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            els.form.dispatchEvent(new Event('submit', { cancelable: true }));
-        }
-    });
-
-    // Старт
-    heartbeat();
-    poll();
-    state.pollingTimer = setInterval(poll, 3000);
-    state.heartbeatTimer = setInterval(heartbeat, 10000);
-})();
+(function(){var E={l:document.getElementById('chatList'),f:document.getElementById('chatForm'),
+i:document.getElementById('chatInput'),fl:document.getElementById('chatFile'),
+p:document.getElementById('chatPreview'),pi:document.getElementById('chatPreviewImg'),
+pr:document.getElementById('chatPreviewRemove'),rb:document.getElementById('chatReplyBox'),
+rn:document.getElementById('chatReplyNick'),rt:document.getElementById('chatReplyText'),
+rc:document.getElementById('chatReplyCancel'),o:document.getElementById('chatOnline'),
+mn:document.getElementById('chatMeNick'),cn:document.getElementById('chatChangeNick'),
+s:document.getElementById('chatSendBtn'),st:document.getElementById('chatStatus')};
+if(!E.l)return;var S={me:null,msgs:[],last:'',rep:null,ph:null};
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function api(u,o){return fetch(u,o||{}).then(r=>r.json());}
+function fm(f){var d=new FormData();for(var k in f)if(f[k]!=null)d.append(k,f[k]);return d;}
+function rMsg(m){var d=document.createElement('div');d.className='chat-msg'+(m.isAdmin?' chat-msg-admin':'');d.dataset.id=m.id;
+var a=document.createElement('div');a.className='chat-msg-avatar'+(m.isAdmin?' chat-msg-avatar-admin':'');
+a.textContent=(m.nickname||'?').charAt(0).toUpperCase();
+var b=document.createElement('div');b.className='chat-msg-body';
+var h=document.createElement('div');h.className='chat-msg-head';
+h.innerHTML='<span class="chat-msg-nick">'+esc(m.nickname)+'</span>'+
+(m.isAdmin?'<span class="chat-msg-check" title="admin"><svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>':'')+
+'<span class="chat-msg-time">'+(m.created_at||'').slice(11,16)+'</span>';
+b.appendChild(h);
+if(m.replyTo){var r=document.createElement('div');r.className='chat-msg-reply';
+r.innerHTML='<b>'+esc(m.replyTo.nickname)+'</b> '+esc(m.replyTo.text);b.appendChild(r);}
+if(m.text){var t=document.createElement('div');t.className='chat-msg-text';t.textContent=m.text;b.appendChild(t);}
+if(m.photo){var w=document.createElement('a');w.className='chat-msg-photo';w.href=m.photo;w.target='_blank';w.rel='noopener';
+var im=document.createElement('img');im.src=m.photo;im.loading='lazy';w.appendChild(im);b.appendChild(w);}
+var ac=document.createElement('div');ac.className='chat-msg-actions';
+var rb=document.createElement('button');rb.type='button';rb.className='chat-msg-reply-btn';rb.textContent='Ответить';
+rb.onclick=()=>setRep(m);ac.appendChild(rb);b.appendChild(ac);
+d.appendChild(a);d.appendChild(b);return d;}
+function app(list){var bt=E.l.scrollHeight-E.l.scrollTop-E.l.clientHeight<80;
+list.forEach(m=>{if(S.msgs.some(x=>x.id===m.id))return;S.msgs.push(m);E.l.appendChild(rMsg(m));});
+if(bt)E.l.scrollTop=E.l.scrollHeight;}
+function hb(){api('/api/chat/heartbeat',{method:'POST'}).then(r=>{if(r.ok){E.o.textContent=r.online;S.me=r.me;E.mn.textContent=r.me.nickname;}}).catch(()=>{});}
+function poll(){var u='/api/chat/messages'+(S.last?'?since='+encodeURIComponent(S.last):'');
+api(u).then(r=>{if(r.ok&&r.messages.length){app(r.messages);S.last=r.messages[r.messages.length-1].id;}}).catch(()=>{});}
+function setRep(m){S.rep=m;E.rb.style.display='flex';E.rn.textContent=m.nickname;
+E.rt.textContent=(m.text||'').slice(0,80)||'фото';E.i.focus();}
+function clearRep(){S.rep=null;E.rb.style.display='none';}
+E.fl.addEventListener('change',()=>{var f=E.fl.files[0];if(!f)return;
+if(f.size>5*1024*1024){alert('фото >5MB');E.fl.value='';return;}
+var rd=new FileReader();rd.onload=e=>{S.ph=e.target.result;E.pi.src=S.ph;E.p.style.display='flex';};rd.readAsDataURL(f);});
+E.pr.addEventListener('click',()=>{S.ph=null;E.fl.value='';E.p.style.display='none';});
+E.cn.addEventListener('click',()=>{if(S.me&&S.me.isAdmin){alert('админ = Badr');return;}
+var n=prompt('Ник (2-24):',S.me?S.me.nickname:'');if(!n)return;n=n.trim();if(n.length<2)return alert('мало');
+api('/api/chat/set-nickname',{method:'POST',body:fm({nickname:n})}).then(r=>{
+if(r.ok){S.me.nickname=r.nickname;E.mn.textContent=r.nickname;alert('OK: '+r.nickname);}else alert(r.error);});});
+E.f.addEventListener('submit',e=>{e.preventDefault();
+var t=E.i.value.trim();if(!t&&!S.ph)return;E.s.disabled=true;E.st.textContent='отправка...';
+var pl={text:t};if(S.ph)pl.photo=S.ph;if(S.rep)pl.replyTo=S.rep.id;
+api('/api/chat/send',{method:'POST',body:fm(pl)}).then(r=>{E.s.disabled=false;
+if(r.ok){E.i.value='';E.st.textContent='';S.ph=null;E.fl.value='';E.p.style.display='none';clearRep();
+S.msgs.push(r.message);E.l.appendChild(rMsg(r.message));E.l.scrollTop=E.l.scrollHeight;S.last=r.message.id;}
+else E.st.textContent=r.error||'err';}).catch(()=>{E.s.disabled=false;E.st.textContent='net';});});
+E.rc.addEventListener('click',clearRep);
+E.i.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();E.f.dispatchEvent(new Event('submit',{cancelable:true}));}});
+hb();poll();setInterval(poll,3000);setInterval(hb,10000);})();
