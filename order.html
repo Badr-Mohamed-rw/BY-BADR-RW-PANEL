@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Заказать лаунчер — By Badr</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="panel.css">
+</head>
+<script src="cookie-banner.js"></script>
+<script src="visual.js"></script>
+<script src="api.js"></script>
+<body>
+
+<div class="site-bg"></div>
+<div class="site-overlay"></div>
+
+<header>
+    <div class="logo-wrap">
+        <img src="Images/logo.svg" class="logo" alt="logo">
+        <span>BY BADR</span>
+    </div>
+    <nav>
+        <a href="index.html">Главная</a>
+        <a href="shop.html">Магазин</a>
+        <a href="order.html" class="active">Заказать лаунчер</a>
+        <a href="panel.html">Панель</a>
+    </nav>
+</header>
+
+<main class="content form-container">
+    <h1>Новый заказ</h1>
+    <p class="subtitle">Заполни форму — я одобрю в течение 2-3 часов</p>
+
+    <section class="screenshots" style="margin: 0 0 40px;">
+        <h2 style="font-size: 22px; margin-bottom: 20px;">Примеры лаунчеров</h2>
+        <div class="screens-grid">
+            <div class="screen-item">
+                <img src="Image/sk.png" alt="Пример лаунчера 1" loading="lazy">
+            </div>
+            <div class="screen-item">
+                <img src="Image/sonic.png" alt="Пример лаунчера 2" loading="lazy">
+            </div>
+        </div>
+    </section>
+
+    <form id="orderForm">
+        <div class="form-group">
+            <label>Название проекта *</label>
+            <input type="text" name="name" required placeholder="Например: Arizona RP">
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>IP сервера *</label>
+                <input type="text" name="ip" required placeholder="188.127.241.74">
+            </div>
+            <div class="form-group">
+                <label>Порт *</label>
+                <input type="number" name="port" required placeholder="2071">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Ссылка на сборку *</label>
+            <input type="url" name="gameUrl" required placeholder="https://example.com/build.zip">
+            <small>Прямая ссылка на .zip / .rar / .7z архив со сборкой (GTA SA + SAMP). Игрок скачает её при первом запуске лаунчера.</small>
+        </div>
+
+        <div class="form-group">
+            <label>Ссылка на фон (необязательно)</label>
+            <input type="url" name="bgUrl" placeholder="https://... (пусто = дефолтный)">
+        </div>
+
+        <div class="form-group">
+            <label>Ссылка на логотип (необязательно)</label>
+            <input type="url" name="logoUrl" placeholder="https://... (пусто = дефолтный)">
+        </div>
+
+        <div class="form-group">
+            <label>Сайт (необязательно)</label>
+            <input type="url" name="siteUrl" placeholder="https://твой-сайт.ru">
+        </div>
+
+        <div class="form-group">
+            <label>Форум / VK (необязательно)</label>
+            <input type="url" name="forumUrl" placeholder="https://vk.com/твоя-группа">
+        </div>
+
+        <div class="form-group">
+            <label>Новости (по одной в строке)</label>
+            <textarea name="news" rows="5" placeholder="Заголовок 1 | https://ссылка/1 | https://картинка1.png
+Заголовок 2 | https://ссылка/2 | https://картинка2.png"></textarea>
+            <small>Формат: <b>Заголовок | ссылка | картинка</b></small>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Куда отправить? *</label>
+                <select name="contactType" required>
+                    <option value="">— Выбери —</option>
+                    <option value="email">Email</option>
+                    <option value="telegram">Telegram</option>
+                    <option value="vk">ВКонтакте</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Твой контакт *</label>
+                <input type="text" name="contact" required placeholder="@nick / email / ссылка">
+            </div>
+        </div>
+
+        <button type="submit" class="btn-primary">
+            <i class="fa-solid fa-paper-plane"></i> Отправить заявку
+        </button>
+
+        <div id="orderStatus" class="form-status"></div>
+    </form>
+</main>
+
+<footer>
+    <p>© 2026 By Badr · Все лаунчеры бесплатно</p>
+    <p class="credits">За основу: <b>Empire State Project</b> · автор <b>shadexqz</b></p>
+</footer>
+
+<script>
+/* ---- Проверка авторизации ---- */
+(async function () {
+    var me = await apiGet('me');
+    if (!me.ok || !me.user) window.location.href = 'panel.html';
+})();
+
+/* ---- Отправка формы ---- */
+document.getElementById('orderForm').onsubmit = async function (e) {
+    e.preventDefault();
+    var fd = new FormData(e.target);
+    var st = document.getElementById('orderStatus');
+
+    st.className = 'form-status';
+    st.innerText = 'Отправка...';
+
+    try {
+        var res = await fetch('/api/order', { method: 'POST', body: fd })
+            .then(function (r) { return r.json(); });
+
+        if (res.ok) {
+            st.className = 'form-status ok';
+            st.innerHTML = '<i class="fa-solid fa-circle-check"></i> Заявка отправлена! <a href="panel.html" style="color:#2ecc71;">Перейти в панель</a>';
+            e.target.reset();
+        } else {
+            st.className = 'form-status fail';
+            st.innerText = res.error || 'Ошибка';
+        }
+    } catch (err) {
+        st.className = 'form-status fail';
+        st.innerText = 'Ошибка соединения';
+    }
+};
+</script>
+
+</body>
+</html>

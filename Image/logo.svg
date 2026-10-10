@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" width="400" height="120">
+  <defs>
+    <linearGradient id="bb-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5dade2"/>
+      <stop offset="100%" stop-color="#9b59b6"/>
+    </linearGradient>
+    <linearGradient id="bb-text" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#c8d0e6"/>
+    </linearGradient>
+    <filter id="bb-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Иконка слева: BB в круге -->
+  <g transform="translate(60, 60)">
+    <circle r="46" fill="url(#bb-grad)" filter="url(#bb-glow)"/>
+    <circle r="44" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+    <circle r="38" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="1"/>
+
+    <!-- BB текстом — идеально ровно всегда -->
+    <text x="0" y="0"
+          text-anchor="middle"
+          dominant-baseline="central"
+          font-family="'Montserrat', 'Arial Black', sans-serif"
+          font-size="42"
+          font-weight="900"
+          letter-spacing="-2"
+          fill="#ffffff">BB</text>
+  </g>
+
+  <!-- Текст BY BADR -->
+  <text x="130" y="58"
+        font-family="'Montserrat', 'Arial Black', sans-serif"
+        font-size="34" font-weight="800" letter-spacing="3"
+        fill="url(#bb-text)">BY BADR</text>
+
+  <!-- Подзаголовок -->
+  <text x="132" y="82"
+        font-family="'Montserrat', sans-serif"
+        font-size="11" font-weight="500" letter-spacing="6"
+        fill="#5dade2" opacity="0.9">LAUNCHER STUDIO</text>
+
+  <!-- Декоративная линия -->
+  <line x1="132" y1="90" x2="360" y2="90"
+        stroke="url(#bb-grad)" stroke-width="2" opacity="0.6"/>
+</svg>

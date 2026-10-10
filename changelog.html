@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Обновления — By Badr</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="panel.css">
+    <style>
+        .timeline { position: relative; padding-left: 40px; margin-top: 40px; }
+        .timeline::before {
+            content: ''; position: absolute; left: 12px; top: 0; bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, #ffc95f, rgba(255,201,95,0.1));
+        }
+        .release {
+            position: relative; margin-bottom: 40px;
+            padding: 24px 28px;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 18px; transition: 0.3s;
+        }
+        .release:hover {
+            border-color: rgba(255,255,255,0.25);
+            transform: translateX(6px);
+            background: rgba(0,0,0,0.55);
+        }
+        .release::before {
+            content: ''; position: absolute; left: -34px; top: 30px;
+            width: 16px; height: 16px; border-radius: 50%;
+            background: #ffc95f; border: 3px solid #25293c;
+            box-shadow: 0 0 0 4px rgba(255,201,95,0.15);
+        }
+        .release-version {
+            display: inline-block;
+            background: rgba(255,201,95,0.15);
+            color: #ffc95f; padding: 4px 14px; border-radius: 30px;
+            font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+        .release-date {
+            float: right; font-size: 12px;
+            color: rgba(255,255,255,0.4); margin-top: 6px;
+        }
+        .release h3 { font-size: 20px; margin-bottom: 14px; color: #fff; font-weight: 700; }
+        .release ul { list-style: none; padding: 0; }
+        .release li {
+            padding: 6px 0; font-size: 14px;
+            color: rgba(255,255,255,0.75);
+            display: flex; align-items: flex-start; gap: 10px; line-height: 1.5;
+        }
+        .release li::before {
+            content: ''; font-family: 'Font Awesome 6 Free';
+            font-weight: 900; flex-shrink: 0;
+        }
+        .release li.plus::before { content: '\f067'; color: #2ecc71; font-size: 11px; margin-top: 4px; }
+        .release li.fix::before { content: '\f0ad'; color: #f39c12; font-size: 12px; margin-top: 3px; }
+        .release li.rem::before { content: '\f068'; color: #e74c3c; font-size: 11px; margin-top: 4px; }
+        .tag-new {
+            display: inline-block;
+            background: rgba(46,204,113,0.2);
+            color: #2ecc71; font-size: 10px; font-weight: 700;
+            padding: 2px 8px; border-radius: 6px; margin-left: 8px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        @media (max-width: 768px) {
+            .timeline { padding-left: 24px; }
+            .release::before { left: -24px; width: 12px; height: 12px; }
+            .release { padding: 18px 20px; }
+            .release h3 { font-size: 16px; }
+            .release li { font-size: 13px; }
+            .release-date { float: none; display: block; margin-bottom: 8px; }
+        }
+    </style>
+</head>
+<script src="cookie-banner.js"></script>
+<script src="visual.js"></script>
+<body>
+
+<div class="site-bg"></div>
+<div class="site-overlay"></div>
+
+<header>
+    <div class="logo-wrap">
+        <img src="Images/logo.svg" class="logo" alt="logo">
+        <span>BY BADR</span>
+    </div>
+    <nav>
+        <a href="index.html">Главная</a>
+        <a href="shop.html">Магазин</a>
+        <a href="order.html">Заказать лаунчер</a>
+        <a href="changelog.html" class="active">Обновления</a>
+        <a href="panel.html">Панель</a>
+        <a href="privacy.html">Политика</a>
+    </nav>
+</header>
+
+<main class="content" style="max-width: 900px;">
+    <h1>Обновления</h1>
+    <p class="subtitle">Что мы делали за всё время</p>
+
+    <div class="timeline">
+
+        <div class="release">
+            <span class="release-date">10 октября 2026</span>
+            <span class="release-version">v 0.1.1</span>
+            <h3>Осеннее обновление сайта <span class="tag-new">NEW</span></h3>
+            <ul>
+                <li class="plus">Добавлена анимация падающих осенних листьев на страницу магазина</li>
+                <li class="plus">4 формы листьев (кленовый, дубовый, берёзовый, простой) с 11 оттенками</li>
+                <li class="plus">Листья покачиваются, вращаются и реалистично «переворачиваются» в воздухе</li>
+                <li class="plus">Спрайтовая система рендеринга — листья кэшируются и отрисовываются мгновенно</li>
+                <li class="fix">Устранены лаги на слабых устройствах — канвас не нагружает процессор</li>
+                <li class="plus">Адаптивная плотность: на мобильных меньше листьев, на ПК больше</li>
+                <li class="plus">Анимация останавливается при скрытой вкладке (экономия батареи)</li>
+                <li class="plus">Уважает настройку ОС «Уменьшить движение» (prefers-reduced-motion)</li>
+                <li class="plus">В магазин добавлен новый товар — подробности в разделе «Магазин»</li>
+                <li class="fix">Исправлена навигация в магазине (ссылки .php → .html)</li>
+            </ul>
+        </div>
+
+        <div class="release">
+            <span class="release-date">16 сентября 2026</span>
+            <span class="release-version">v 0.1.0</span>
+            <h3>Переезд на Node.js</h3>
+            <ul>
+                <li class="plus">Бэкенд переписан с PHP на Node.js (express + express-session)</li>
+                <li class="plus">Сессии на 30 дней через express-session</li>
+                <li class="plus">Хеширование паролей через bcryptjs</li>
+                <li class="plus">Все страницы теперь — чистый HTML + JS (без PHP)</li>
+                <li class="plus">Хранение данных в JSON (data/users.json, orders.json, reviews.json)</li>
+                <li class="fix">Скрыты серверные файлы (server.js, package.json, node_modules, data)</li>
+                <li class="plus">Полная совместимость с Node.js 13+</li>
+            </ul>
+        </div>
+
+        <div class="release">
+            <span class="release-date">16 сентября 2026</span>
+            <span class="release-version">v 0.0.2</span>
+            <h3>Запуск сайта и панели</h3>
+            <ul>
+                <li class="plus">Создан сайт с главной, магазином и разделом заказа</li>
+                <li class="plus">Регистрация и вход с сохранением в JSON</li>
+                <li class="plus">Личный кабинет с историей заказов</li>
+                <li class="plus">Админ-панель: одобрение заказов и отправка на контакт</li>
+                <li class="plus">Поддержка контактов: Email, Telegram, VK</li>
+                <li class="plus">Политика конфиденциальности + баннер cookie</li>
+                <li class="plus">Сессия 30 дней (если принял cookie)</li>
+                <li class="plus">Галерея примеров лаунчеров с лайтбоксом</li>
+                <li class="fix">Убрана обязательная загрузка сборки — берётся дефолтная</li>
+                <li class="rem">Убран Telegram из политики (только email)</li>
+            </ul>
+        </div>
+
+        <div class="release">
+            <span class="release-date">15 сентября 2026</span>
+            <span class="release-version">v 0.0.1</span>
+            <h3>Первый лаунчер By Badr</h3>
+            <ul>
+                <li class="plus">Разработан лаунчер на Electron 22 (совместим с Windows 7)</li>
+                <li class="plus">Стильный дизайн: фон, лого, стеклянное меню</li>
+                <li class="plus">Вкладки: Главная, Новости, Моды</li>
+                <li class="plus">Авторизация по нику + подключение к SAMP</li>
+                <li class="plus">Мониторинг онлайна сервера через UDP query</li>
+                <li class="plus">Автоматическое скачивание и распаковка сборки</li>
+                <li class="plus">Прогресс-бар с процентами и MB</li>
+                <li class="plus">Вкладка «Моды» — установка SkyGFX (PS2 / PC / Mobile)</li>
+                <li class="plus">Настройки: путь к игре + переустановка сборки</li>
+                <li class="plus">Анимированное закрытие и сворачивание</li>
+            </ul>
+        </div>
+
+        <div class="release">
+            <span class="release-date">14 сентября 2026</span>
+            <span class="release-version">v 0.0.0</span>
+            <h3>Начало работы над проектом</h3>
+            <ul>
+                <li class="plus">Взяли за основу исходники Empire State Project (Electron/JS)</li>
+                <li class="plus">Адаптировали под стиль By Badr</li>
+                <li class="plus">Настроили API: динамические новости, сервера, ссылки</li>
+                <li class="plus">Защита по домену (никто не подсунет свой servers.json)</li>
+                <li class="fix">Исправлена кодировка win1251 (кириллица в названиях серверов)</li>
+                <li class="fix">Исправлен краш из-за символа «|» в productName</li>
+            </ul>
+        </div>
+
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2026 By Badr — Все лаунчеры бесплатно</p>
+    <p class="credits">За основу: <b>Empire State Project</b> — автор <b>shadexqz</b></p>
+</footer>
+
+</body>
+</html>

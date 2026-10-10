@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Админка — By Badr</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="panel.css">
+    <style>
+        .contact-block {
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid rgba(52, 152, 219, 0.35);
+            border-radius: 14px;
+            padding: 18px 22px;
+            margin: 16px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .contact-block .contact-type {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        .contact-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .contact-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #5dade2;
+            background: rgba(0,0,0,0.4);
+            padding: 12px 18px;
+            border-radius: 10px;
+            flex: 1;
+            word-break: break-all;
+            font-family: monospace;
+            user-select: all;
+        }
+        .btn-copy {
+            padding: 12px 20px;
+            background: rgba(52, 152, 219, 0.2);
+            border: 1px solid rgba(52, 152, 219, 0.5);
+            color: #5dade2;
+            border-radius: 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-copy:hover { background: rgba(52, 152, 219, 0.4); color: #fff; }
+        .btn-copy.copied { background: rgba(46, 204, 113, 0.3); border-color: #2ecc71; color: #2ecc71; }
+        .btn-open {
+            padding: 12px 20px;
+            background: rgba(155, 89, 182, 0.2);
+            border: 1px solid rgba(155, 89, 182, 0.5);
+            color: #b794f6;
+            border-radius: 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.25s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-open:hover { background: rgba(155, 89, 182, 0.4); color: #fff; }
+        .contact-hint { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+    </style>
+</head>
+<script src="cookie-banner.js"></script>
+<script src="visual.js"></script>
+<script src="api.js"></script>
+<body>
+
+<div class="site-bg"></div>
+<div class="site-overlay"></div>
+
+<header>
+    <div class="logo-wrap">
+        <img src="Images/logo.svg" class="logo" alt="logo">
+        <span>ADMIN</span>
+    </div>
+    <nav>
+        <a href="index.html">Главная</a>
+        <a href="shop.html">Магазин</a>
+        <a href="panel.html">Панель</a>
+        <a href="admin.html" class="active">Админка</a>
+    </nav>
+</header>
+
+<main class="content">
+    <h1>Заказы</h1>
+    <p class="subtitle">Обновляется каждые 5 минут</p>
+
+    <div id="adminOrders"></div>
+</main>
+
+<footer>
+    <p>© 2026 By Badr · Admin Panel</p>
+    <p class="credits">За основу: <b>Empire State Project</b> · автор <b>shadexqz</b></p>
+</footer>
+
+<script>
+var STATUS_MAP = {
+    pending: '⏳ Ожидает',
+    approved: '📨 Ожидает отправки',
+    completed: '✅ Отправлено',
+    rejected: '❌ Отклонено'
+};
+
+function buildContactBlock(o) {
+    var iconClass = 'fa-envelope';
+    var openLink = '';
+    var label = 'Открыть';
+
+    if (o.contactType === 'telegram') {
+        iconClass = 'fa-paper-plane';
+        label = 'Открыть в Telegram';
+        var nick = String(o.contact).replace('@', '');
+        openLink = 'https://t.me/' + nick;
+    } else if (o.contactType === 'vk') {
+        iconClass = 'fa-users';
+        label = 'Открыть в VK';
+        var nick2 = String(o.contact).replace('@', '').replace('vk.com/', '').replace('https://', '');
+        openLink = 'https://vk.com/' + nick2;
+    } else if (o.contactType === 'email') {
+        iconClass = 'fa-envelope';
+        label = 'Написать на Email';
+        openLink = 'mailto:' + o.contact + '?subject=Твой лаунчер готов&body=Привет! Лаунчер готов, держи файл.';
+    }
+
+    var html = '';
+    html += '<div class="contact-block">';
+    html += '<div class="contact-type">';
+    html += '<i class="fa-solid ' + iconClass + '"></i> Контакт клиента — <b>' + String(o.contactType).toUpperCase() + '</b>';
+    html += '</div>';
+    html += '<div class="contact-row">';
+    html += '<div class="contact-value">' + escapeHtmlJs(o.contact) + '</div>';
+    html += '<button class="btn-copy" data-copy="' + escapeHtmlJs(o.contact) + '"><i class="fa-solid fa-copy"></i> Копировать</button>';
+    if (openLink) {
+        html += '<a href="' + openLink + '" target="_blank" class="btn-open"><i class="fa-solid fa-arrow-up-right-from-square"></i> ' + label + '</a>';
+    }
+    html += '</div>';
+    html += '<div class="contact-hint">1. Отправь клиенту готовый .exe по этому контакту<br>2. После отправки нажми «Отметить как отправлено»</div>';
+    html += '</div>';
+    html += '<div class="order-actions">';
+    html += '<button class="btn-primary js-marksent" data-id="' + o.id + '"><i class="fa-solid fa-paper-plane"></i> Отметить как отправлено</button>';
+    html += '</div>';
+    return html;
+}
+
+function buildInfo(o) {
+    var info = '';
+    info += '<p><b>Email:</b> ' + escapeHtmlJs(o.user) + '</p>';
+    info += '<p><b>IP:</b> ' + escapeHtmlJs(o.ip) + ':' + escapeHtmlJs(o.port) + '</p>';
+    if (o.bgUrl) info += '<p><b>Фон:</b> <a href="' + escapeHtmlJs(o.bgUrl) + '" target="_blank">' + escapeHtmlJs(o.bgUrl) + '</a></p>';
+    if (o.logoUrl) info += '<p><b>Лого:</b> <a href="' + escapeHtmlJs(o.logoUrl) + '" target="_blank">' + escapeHtmlJs(o.logoUrl) + '</a></p>';
+    if (o.gameUrl) info += '<p><b>Сборка:</b> <a href="' + escapeHtmlJs(o.gameUrl) + '" target="_blank">' + escapeHtmlJs(o.gameUrl) + '</a></p>';
+    if (o.siteUrl) info += '<p><b>Сайт:</b> ' + escapeHtmlJs(o.siteUrl) + '</p>';
+    if (o.forumUrl) info += '<p><b>Форум:</b> ' + escapeHtmlJs(o.forumUrl) + '</p>';
+    if (o.news) info += '<p><b>Новости:</b></p><pre class="news-pre">' + escapeHtmlJs(o.news) + '</pre>';
+    info += '<p><b>Создан:</b> ' + escapeHtmlJs(o.created_at) + '</p>';
+    return info;
+}
+
+function buildActions(o) {
+    if (o.status === 'pending') {
+        return '<div class="order-actions">' +
+            '<button class="btn-primary js-approve" data-id="' + o.id + '"><i class="fa-solid fa-check"></i> Одобрить</button>' +
+            '<button class="btn-download danger js-reject" data-id="' + o.id + '"><i class="fa-solid fa-xmark"></i> Отклонить</button>' +
+            '</div>';
+    }
+    if (o.status === 'approved') return buildContactBlock(o);
+    if (o.status === 'completed') {
+        return '<p style="color:#2ecc71;margin-top:14px;"><i class="fa-solid fa-circle-check"></i> Отправлено клиенту по ' +
+            String(o.contactType).toUpperCase() + ' — ' + escapeHtmlJs(o.contact) + '</p>';
+    }
+    if (o.status === 'rejected') {
+        return '<p style="color:#e74c3c;margin-top:14px;"><i class="fa-solid fa-xmark"></i> Отклонено</p>';
+    }
+    return '';
+}
+
+async function loadOrders() {
+    var res = await fetch('/api/all-orders').then(function (r) { return r.json(); });
+    var box = document.getElementById('adminOrders');
+    box.innerHTML = '';
+
+    if (!res.ok) { box.innerHTML = '<p>Ошибка доступа</p>'; return; }
+    if (res.orders.length === 0) {
+        box.innerHTML = '<p style="color:rgba(255,255,255,0.5);">Заказов нет</p>';
+        return;
+    }
+
+    res.orders.reverse().forEach(function (o) {
+        var card = document.createElement('div');
+        card.className = 'order-card';
+        card.innerHTML =
+            '<div class="order-head">' +
+                '<h3>' + escapeHtmlJs(o.name) + '</h3>' +
+                '<span class="order-status ' + o.status + '">' + (STATUS_MAP[o.status] || o.status) + '</span>' +
+            '</div>' +
+            '<div class="order-info">' + buildInfo(o) + '</div>' +
+            buildActions(o);
+        box.appendChild(card);
+    });
+}
+
+async function approve(id) {
+    var res = await apiPost('approve', { id: id });
+    if (res.ok) loadOrders(); else alert(res.error);
+}
+async function reject(id) {
+    if (!confirm('Отклонить заказ?')) return;
+    var res = await apiPost('reject', { id: id });
+    if (res.ok) loadOrders();
+}
+async function markSent(id) {
+    if (!confirm('Подтверди что ты уже отправил лаунчер клиенту.')) return;
+    var res = await apiPost('mark-sent', { id: id });
+    if (res.ok) loadOrders(); else alert(res.error);
+}
+
+document.addEventListener('click', function (e) {
+    var t = e.target.closest('button');
+    if (!t) return;
+
+    if (t.classList.contains('js-approve')) { approve(t.dataset.id); return; }
+    if (t.classList.contains('js-reject')) { reject(t.dataset.id); return; }
+    if (t.classList.contains('js-marksent')) { markSent(t.dataset.id); return; }
+
+    if (t.classList.contains('btn-copy')) {
+        var val = t.dataset.copy || '';
+        navigator.clipboard.writeText(val).then(function () {
+            var orig = t.innerHTML;
+            t.classList.add('copied');
+            t.innerHTML = '<i class="fa-solid fa-check"></i> Скопировано';
+            setTimeout(function () {
+                t.classList.remove('copied');
+                t.innerHTML = orig;
+            }, 1500);
+        });
+    }
+});
+
+(async function () {
+    var me = await apiGet('me');
+    if (!me.ok || !me.isAdmin) {
+        window.location.href = 'panel.html';
+        return;
+    }
+    loadOrders();
+    setInterval(loadOrders, 5 * 60 * 1000);
+})();
+</script>
+
+</body>
+</html>
