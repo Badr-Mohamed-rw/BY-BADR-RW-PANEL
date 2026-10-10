@@ -368,21 +368,21 @@ app.post('/api/admin-delete-review', requireAdmin, function (req, res) {
     res.json({ ok: true });
 });
 
-app.use('/api', function (req, res) {
-    res.status(404).json({ ok: false, error: 'Неизвестное действие' });
-});
-
-app.use(express.static(__dirname, { index: 'index.html' }));
-
 /* === CHAT API === */
 try {
     const chatConfig = require('./chat-config.js');
     const chatApi = require('./chat-api.js');
     chatApi(app, chatConfig);
-    console.log('[chat] API подключён');
+    console.log('[chat] OK');
 } catch (e) {
-    console.error('[chat] ошибка подключения:', e.message);
+    console.error('[chat] FAIL:', e.message);
 }
+
+app.use('/api', function (req, res) {
+    res.status(404).json({ ok: false, error: 'Неизвестное действие' });
+});
+
+app.use(express.static(__dirname, { index: 'index.html' }));
 
 app.listen(PORT, function () {
     console.log('');
