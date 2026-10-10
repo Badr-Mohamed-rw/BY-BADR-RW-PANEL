@@ -1,6 +1,60 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+<script>/* kill-tatnet-badge */
+(function(){
+  "use strict";
+  var RE = /^x-[a-z0-9]{4,12}-b$/;
+
+  // 1) Блокируем создание shadow DOM для подозрительных тегов
+  var origAS = Element.prototype.attachShadow;
+  if (origAS) {
+    Element.prototype.attachShadow = function(init){
+      var t = this && this.tagName ? String(this.tagName).toLowerCase() : "";
+      if (RE.test(t)) {
+        throw new DOMException("blocked", "NotSupportedError");
+      }
+      return origAS.call(this, init);
+    };
+  }
+
+  // 2) Не даём добавить подозрительный элемент в DOM
+  var origAC = Node.prototype.appendChild;
+  Node.prototype.appendChild = function(child){
+    if (child && child.nodeType === 1 && child.tagName) {
+      var t = String(child.tagName).toLowerCase();
+      if (RE.test(t)) return child;
+    }
+    return origAC.call(this, child);
+  };
+
+  // 3) Игнорируем MutationObserver-восстановление
+  var origObs = window.MutationObserver;
+  if (origObs) {
+    window.MutationObserver = function(cb){
+      var safe = function(muts, obs){
+        var filtered = [];
+        for (var i = 0; i < muts.length; i++) {
+          var m = muts[i];
+          if (m.type === "childList" && m.addedNodes && m.addedNodes.length) {
+            var bad = false;
+            for (var j = 0; j < m.addedNodes.length; j++) {
+              var n = m.addedNodes[j];
+              if (n && n.nodeType === 1 && n.tagName && RE.test(String(n.tagName).toLowerCase())) {
+                bad = true; break;
+              }
+            }
+            if (bad) continue;
+          }
+          filtered.push(m);
+        }
+        if (filtered.length) cb(filtered, obs);
+      };
+      return new origObs(safe);
+    };
+  }
+})();
+</script>
     <meta charset="UTF-8">
     <title>Обновления — By Badr</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
