@@ -374,6 +374,16 @@ app.use('/api', function (req, res) {
 
 app.use(express.static(__dirname, { index: 'index.html' }));
 
+/* === CHAT API === */
+try {
+    const chatConfig = require('./chat-config.js');
+    const chatApi = require('./chat-api.js');
+    chatApi(app, chatConfig);
+    console.log('[chat] API подключён');
+} catch (e) {
+    console.error('[chat] ошибка подключения:', e.message);
+}
+
 app.listen(PORT, function () {
     console.log('');
     console.log('========================================');
